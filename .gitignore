@@ -16,3 +16,6 @@
 
 # DB info
 config/config.toml
+
+# JWT secret key
+library/jwt/secretkey.go

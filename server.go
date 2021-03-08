@@ -17,6 +17,7 @@ func main() {
 
 	r.GET("/test", controller.ServerTest)
 	r.POST("/signup", controller.SignUp)
+	r.POST("signin", controller.Signin)
 
 	r.Run(":3000")
 }
