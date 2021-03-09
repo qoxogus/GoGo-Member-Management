@@ -10,9 +10,8 @@ import (
 
 // SigninParam - 파라미터 형식 구조체
 type SigninParam struct {
-	ID   string `json:"id" form:"id" query:"id"`
-	Pw   string `json:"pw" form:"pw" query:"pw"`
-	Name string `json:"name" query:"name"`
+	ID string `json:"id" form:"id" query:"id"`
+	Pw string `json:"pw" form:"pw" query:"pw"`
 }
 
 // Signin - 로그인 메서드
@@ -23,7 +22,7 @@ func Signin(c *gin.Context) {
 		return
 	}
 
-	fmt.Println(u.ID, u.Pw, u.Name)
+	fmt.Println(u.ID, u.Pw)
 
 	User := &database.User{}
 	err := database.DB.Where("user_id = ? AND pw = ?", u.ID, u.Pw).Find(User).Error
@@ -39,7 +38,7 @@ func Signin(c *gin.Context) {
 
 	fmt.Println(User.UserID, User.Name)
 
-	refreshToken, err := jwt.CreateRefreshToken(User.UserID, User.Name)
+	refreshToken, err := jwt.CreateRefreshToken(User.Name)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"status":       500,
@@ -50,7 +49,7 @@ func Signin(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := jwt.CreateAccessToken(User.UserID, User.Name, User.IsManager)
+	accessToken, err := jwt.CreateAccessToken(User.Name, User.IsManager)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"status":       500,
@@ -60,6 +59,7 @@ func Signin(c *gin.Context) {
 		})
 		return
 	}
+	c.SetCookie("access-token", accessToken, 60*60*24, "/", "localhost:3000", false, false)
 	c.JSON(200, gin.H{
 		"status": 200,
 		"message": "토큰 발급 완료",
