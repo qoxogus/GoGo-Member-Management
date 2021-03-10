@@ -50,7 +50,7 @@ func VerifyRefreshToken() {
 
 // VerifyAccessToken - Middleware that verify AccessToken
 func VerifyAccessToken(c *gin.Context) {
-	token, err := c.Request.Cookie("access-token")
+	ctoken, err := c.Request.Cookie("access-token")
 	if err != nil {
 		c.JSON(401, gin.H{
 			"status":  401,
@@ -59,9 +59,9 @@ func VerifyAccessToken(c *gin.Context) {
 		c.Abort()
 		return
 	}
-	tknstr := token.Value
+	tknstr := ctoken.Value
 
-	fmt.Println(token)
+	fmt.Println(ctoken)
 	fmt.Println("token string : " + tknstr)
 
 	if tknstr == "" {
@@ -71,6 +71,22 @@ func VerifyAccessToken(c *gin.Context) {
 		})
 		c.Abort()
 		return
+	}
+
+	claims := jwt.MapClaims{}
+
+	token, err := jwt.ParseWithClaims(tknstr, &claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(secretKey), nil
+	})
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Printf("token : %v\n", token)
+
+	for key, val := range claims {
+		fmt.Printf("Key : %v, value : %v\n", key, val)
 	}
 
 	// claims := tknstr.Claims(jwt.MapClaims)
