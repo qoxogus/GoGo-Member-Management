@@ -88,10 +88,4 @@ func VerifyAccessToken(c *gin.Context) {
 	for key, val := range claims {
 		fmt.Printf("Key : %v, value : %v\n", key, val)
 	}
-
-	// claims := tknstr.Claims(jwt.MapClaims)
-	// Name := claims["Name"].(string)
-	// IsManager := claims["IsManager"].(bool)
-	// c.Set("Name", Name)
-	// c.Set("IsManager", IsManager)
 }
