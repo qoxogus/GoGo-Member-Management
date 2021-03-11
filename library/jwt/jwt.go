@@ -50,6 +50,7 @@ func VerifyRefreshToken() {
 
 // VerifyAccessToken - Middleware that verify AccessToken
 func VerifyAccessToken(c *gin.Context) {
+	// c.Get("user").(*jwt.Token)
 	ctoken, err := c.Request.Cookie("access-token")
 	if err != nil {
 		c.JSON(401, gin.H{
@@ -61,8 +62,8 @@ func VerifyAccessToken(c *gin.Context) {
 	}
 	tknstr := ctoken.Value
 
-	fmt.Println(ctoken)
-	fmt.Println("token string : " + tknstr)
+	fmt.Println(ctoken)                     //쿠키에서 받아온 값
+	fmt.Println("token string : " + tknstr) // 쿠키에서 value로 추출해온 값
 
 	if tknstr == "" {
 		c.JSON(401, gin.H{
@@ -80,7 +81,10 @@ func VerifyAccessToken(c *gin.Context) {
 	})
 
 	if err != nil {
-		fmt.Println(err)
+		c.JSON(401, gin.H{
+			"status":  401,
+			"message": "토큰 인증 실패.",
+		})
 	}
 
 	fmt.Printf("token : %v\n", token)
@@ -88,4 +92,9 @@ func VerifyAccessToken(c *gin.Context) {
 	for key, val := range claims {
 		fmt.Printf("Key : %v, value : %v\n", key, val)
 	}
+	c.JSON(200, gin.H{
+		"status":  200,
+		"message": "토큰 인증 완료.",
+	})
+	return
 }
