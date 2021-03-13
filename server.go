@@ -23,7 +23,8 @@ func main() {
 	r.GET("/server-test", controller.ServerTest)
 	r.POST("/signup", controller.SignUp)
 	r.POST("signin", controller.Signin)
-	r.POST("/token-test", jwt.VerifyAccessToken)
+	r.POST("/token-test", jwt.VerifyAccessToken, controller.TokenTest)
+	r.POST("/re-token", jwt.VerifyRefreshToken, jwt.CreateReissuanceToken, controller.TokenTest)
 
 	r.Run(":3000")
 }
