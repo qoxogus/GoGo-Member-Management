@@ -63,7 +63,7 @@ func VerifyRefreshToken(c *gin.Context) {
 	if tknstr == "" {
 		c.JSON(401, gin.H{
 			"status":  401,
-			"message": "refresh token is None.",
+			"message": "refresh token is None. (다시 로그인하세요.)",
 		})
 		return
 	}
@@ -190,7 +190,6 @@ func CreateReissuanceToken(c *gin.Context) {
 		})
 		return
 	}
-
 	c.JSON(200, gin.H{
 		"status":      200,
 		"message":     "accessToken 재발급 완료.",
