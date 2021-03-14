@@ -67,4 +67,5 @@ func Signin(c *gin.Context) {
 		"refreshToken": refreshToken,
 		"accessToken":  accessToken,
 	})
+	return
 }

@@ -46,7 +46,7 @@ func CreateAccessToken(Name string, IsManager bool) (string, error) {
 
 // VerifyRefreshToken - Middleware that verify RefreshToken
 func VerifyRefreshToken(c *gin.Context) {
-	ctoken, err := c.Request.Cookie("refresh-token")
+	ctoken, err := c.Request.Cookie("refresh-token") //refreshToken을 DB에 넣는 방법도있다. (조금 더 안전하다.) accessToken을 보내며 재발급 요청 -> DB에서 refreshToken을 가져와 검증. -> 검증완료시 accessToken재발급.
 	if err != nil {
 		c.JSON(401, gin.H{
 			"status":  401,
@@ -146,7 +146,7 @@ func VerifyAccessToken(c *gin.Context) {
 }
 
 func CreateReissuanceToken(c *gin.Context) {
-	actoken, err := c.Request.Cookie("access-token") // access cookie token
+	ctoken, err := c.Request.Cookie("access-token") // access cookie token
 	if err != nil {
 		c.JSON(401, gin.H{
 			"status":  401,
@@ -154,12 +154,12 @@ func CreateReissuanceToken(c *gin.Context) {
 		})
 		return
 	}
-	atknstr := actoken.Value // accessToken쿠키에서 받아온 값
+	tknstr := ctoken.Value // accessToken쿠키에서 받아온 값
 
-	fmt.Println(actoken)                           // accessToken쿠키에서 받아온 값
-	fmt.Println("accessToken string : " + atknstr) // accessToken쿠키에서 value로 추출해온 값
+	fmt.Println(ctoken)                           // accessToken쿠키에서 받아온 값
+	fmt.Println("accessToken string : " + tknstr) // accessToken쿠키에서 value로 추출해온 값
 
-	if atknstr == "" {
+	if tknstr == "" {
 		c.JSON(401, gin.H{
 			"status":  401,
 			"message": "accessToken is None.",
@@ -167,27 +167,28 @@ func CreateReissuanceToken(c *gin.Context) {
 		return
 	}
 
-	aclaims := jwt.MapClaims{}
+	claims := jwt.MapClaims{}
 
-	atoken, _ := jwt.ParseWithClaims(atknstr, &aclaims, func(token *jwt.Token) (interface{}, error) {
+	token, _ := jwt.ParseWithClaims(tknstr, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretKey), nil
 	})
 
-	fmt.Println(atoken) //accessToken
+	fmt.Println(token)
 
-	for key, val := range aclaims {
+	for key, val := range claims {
 		fmt.Printf("Key : %v, value : %v\n", key, val)
 	}
 
-	Name_a := aclaims["Name"].(string)
-	IsManager := aclaims["IsManager"].(bool)
-	accessToken, err := CreateAccessToken(Name_a, IsManager)
+	Name := claims["Name"].(string)
+	IsManager := claims["IsManager"].(bool)
+	accessToken, err := CreateAccessToken(Name, IsManager)
 
 	if err != nil {
 		c.JSON(500, gin.H{
 			"status":  500,
 			"message": "accessToken 생성중 에러",
 		})
+		return
 	}
 
 	c.JSON(200, gin.H{
@@ -195,4 +196,5 @@ func CreateReissuanceToken(c *gin.Context) {
 		"message":     "accessToken 재발급 완료.",
 		"accessToken": accessToken,
 	})
+	return
 }
