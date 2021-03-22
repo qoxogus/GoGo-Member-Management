@@ -46,21 +46,22 @@ func CreateAccessToken(Name string, IsManager bool) (string, error) {
 
 // VerifyRefreshToken - Middleware that verify RefreshToken
 func VerifyRefreshToken(c *gin.Context) {
-	ctoken, err := c.Request.Cookie("refresh-token") //refreshToken을 DB에 넣는 방법도있다. (조금 더 안전하다.) accessToken을 보내며 재발급 요청 -> DB에서 refreshToken을 가져와 검증. -> 검증완료시 accessToken재발급.
-	if err != nil {
+	//refreshToken을 DB에 넣는 방법도있다. (조금 더 안전하다.) accessToken을 보내며 재발급 요청 -> DB에서 refreshToken을 가져와 검증. -> 검증완료시 accessToken재발급.
+	htoken := c.GetHeader("user-token") //리프레쉬토큰
+
+	fmt.Println(htoken)
+
+	if htoken == "" {
 		c.JSON(401, gin.H{
 			"status":  401,
-			"message": "Get Cookie failed",
+			"message": "token is None.",
 		})
 		return
 	}
 
-	tknstr := ctoken.Value
+	fmt.Println(htoken)
 
-	fmt.Println(ctoken)
-	fmt.Println("refresh token string : " + tknstr)
-
-	if tknstr == "" {
+	if htoken == "" {
 		c.JSON(401, gin.H{
 			"status":  401,
 			"message": "refresh token is None. (다시 로그인하세요.)",
@@ -70,7 +71,7 @@ func VerifyRefreshToken(c *gin.Context) {
 
 	claims := jwt.MapClaims{}
 
-	token, err := jwt.ParseWithClaims(tknstr, &claims, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(htoken, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretKey), nil
 	})
 
@@ -97,21 +98,11 @@ func VerifyRefreshToken(c *gin.Context) {
 
 // VerifyAccessToken - Middleware that verify AccessToken
 func VerifyAccessToken(c *gin.Context) {
-	// c.Get("user-token").(*jwt.Token)
-	ctoken, err := c.Request.Cookie("access-token")
-	if err != nil {
-		c.JSON(401, gin.H{
-			"status":  401,
-			"message": "Get Cookie failed",
-		})
-		return
-	}
-	tknstr := ctoken.Value
+	htoken := c.GetHeader("user-token") //엑세스토큰
 
-	fmt.Println(ctoken)                     //쿠키에서 받아온 값
-	fmt.Println("token string : " + tknstr) // 쿠키에서 value로 추출해온 값
+	fmt.Println(htoken)
 
-	if tknstr == "" {
+	if htoken == "" {
 		c.JSON(401, gin.H{
 			"status":  401,
 			"message": "token is None.",
@@ -121,7 +112,7 @@ func VerifyAccessToken(c *gin.Context) {
 
 	claims := jwt.MapClaims{}
 
-	token, err := jwt.ParseWithClaims(tknstr, &claims, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.ParseWithClaims(htoken, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretKey), nil
 	})
 
@@ -146,30 +137,21 @@ func VerifyAccessToken(c *gin.Context) {
 }
 
 func CreateReissuanceToken(c *gin.Context) {
-	ctoken, err := c.Request.Cookie("access-token") // access cookie token
-	if err != nil {
+	htoken := c.GetHeader("user-token") //토큰
+
+	fmt.Println(htoken)
+
+	if htoken == "" {
 		c.JSON(401, gin.H{
 			"status":  401,
-			"message": "Get Cookie failed",
-		})
-		return
-	}
-	tknstr := ctoken.Value // accessToken쿠키에서 받아온 값
-
-	fmt.Println(ctoken)                           // accessToken쿠키에서 받아온 값
-	fmt.Println("accessToken string : " + tknstr) // accessToken쿠키에서 value로 추출해온 값
-
-	if tknstr == "" {
-		c.JSON(401, gin.H{
-			"status":  401,
-			"message": "accessToken is None.",
+			"message": "token is None.",
 		})
 		return
 	}
 
 	claims := jwt.MapClaims{}
 
-	token, _ := jwt.ParseWithClaims(tknstr, &claims, func(token *jwt.Token) (interface{}, error) {
+	token, _ := jwt.ParseWithClaims(htoken, &claims, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretKey), nil
 	})
 

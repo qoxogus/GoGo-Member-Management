@@ -59,8 +59,8 @@ func Signin(c *gin.Context) {
 		})
 		return
 	}
-	c.SetCookie("access-token", accessToken, 60*60, "/", "localhost:3000", false, true)
-	c.SetCookie("refresh-token", refreshToken, 60*60*24*30, "/", "localhost:3000", false, true)
+	// c.SetCookie("access-token", accessToken, 60*60, "/", "localhost:3000", false, true)
+	// c.SetCookie("refresh-token", refreshToken, 60*60*24*30, "/", "localhost:3000", false, true)
 	c.JSON(200, gin.H{
 		"status": 200,
 		"message": "토큰 발급 완료",
