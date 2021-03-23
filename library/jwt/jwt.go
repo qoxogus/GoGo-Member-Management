@@ -47,7 +47,7 @@ func CreateAccessToken(Name string, IsManager bool) (string, error) {
 // VerifyRefreshToken - Middleware that verify RefreshToken
 func VerifyRefreshToken(c *gin.Context) {
 	//refreshToken을 DB에 넣는 방법도있다. (조금 더 안전하다.) accessToken을 보내며 재발급 요청 -> DB에서 refreshToken을 가져와 검증. -> 검증완료시 accessToken재발급.
-	htoken := c.GetHeader("user-token") //리프레쉬토큰
+	htoken := c.GetHeader("user-refresh-token") //리프레쉬토큰
 
 	fmt.Println(htoken)
 
