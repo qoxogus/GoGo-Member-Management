@@ -5,6 +5,7 @@ import (
 	"Gin-api-server/controller"
 	"Gin-api-server/database"
 	"Gin-api-server/library/jwt"
+	"Gin-api-server/middleware"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
@@ -19,6 +20,8 @@ func main() {
 	database.Connect()
 
 	r := gin.Default()
+
+	r.Use(middleware.CORSmiddleware())
 
 	r.GET("/server-test", controller.ServerTest)
 	r.POST("/signup", controller.SignUp)
