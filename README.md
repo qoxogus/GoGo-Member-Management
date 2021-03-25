@@ -8,3 +8,4 @@
 | Develop Language | GO (gin-gonic)|
 | DB               | PostgreSQL |
 | Develop Tool     | Visual Studio Code |
+| ORM | GORM|
