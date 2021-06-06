@@ -1,4 +1,4 @@
-# gin-gonic-api-server
+# GoGo! Member-Management
 
 ## 📌 Stack
 
